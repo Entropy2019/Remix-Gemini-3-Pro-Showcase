@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gemini 3 Pro Benchmark Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              mono: ['Space Mono', 'Noto Sans SC', 'monospace'],
+              sans: ['Chakra Petch', 'Noto Sans SC', 'sans-serif'],
+            },
+            colors: {
+              bg: 'var(--color-bg)',
+              surface: 'var(--color-surface)',
+              'surface-light': 'var(--color-surface-light)',
+              primary: 'var(--color-primary)',
+              secondary: 'var(--color-secondary)',
+              accent: 'var(--color-accent)',
+              text: 'var(--color-text)',
+              dim: 'var(--color-dim)',
+              border: 'var(--color-border)',
+            },
+            animation: {
+              'blink': 'blink 1s step-end infinite',
+              'scanline': 'scanline 8s linear infinite',
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        /* Dark Mode (Default) - Cassette Futurism */
+        --color-bg: #101012;
+        --color-surface: #1c1c1f;
+        --color-surface-light: #2a2a2e;
+        --color-primary: #ffb000; /* Amber */
+        --color-secondary: #e05a00; /* Retro Orange */
+        --color-accent: #00a3a3; /* Teal */
+        --color-text: #cec5b5; /* Off-white */
+        --color-dim: #6b6b6b;
+        --color-border: #333333;
+      }
+
+      [data-theme="light"] {
+        /* Light Mode - Clean Paper/Industrial */
+        --color-bg: #f0f0f2;
+        --color-surface: #ffffff;
+        --color-surface-light: #e4e4e7;
+        --color-primary: #d97706; /* Darker Amber for contrast */
+        --color-secondary: #c2410c;
+        --color-accent: #0f766e;
+        --color-text: #18181b; /* Zinc 900 */
+        --color-dim: #71717a;
+        --color-border: #d4d4d8;
+      }
+
+      body {
+        font-family: 'Space Mono', 'Noto Sans SC', monospace;
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        overflow-x: hidden;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      /* Custom Cursor Logic */
+      @media (pointer: fine) {
+        body:not(.reader-mode) {
+          cursor: none;
+        }
+        body:not(.reader-mode) a, 
+        body:not(.reader-mode) button, 
+        body:not(.reader-mode) input, 
+        body:not(.reader-mode) select, 
+        body:not(.reader-mode) textarea, 
+        body:not(.reader-mode) [role="button"] {
+          cursor: none;
+        }
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Chakra Petch', 'Noto Sans SC', sans-serif;
+        text-transform: uppercase;
+      }
+
+      /* CRT Overlay Effects */
+      .crt-overlay {
+        background: linear-gradient(
+          rgba(18, 16, 16, 0) 50%, 
+          rgba(0, 0, 0, 0.25) 50%
+        ), linear-gradient(
+          90deg, 
+          rgba(255, 0, 0, 0.06), 
+          rgba(0, 255, 0, 0.02), 
+          rgba(0, 0, 255, 0.06)
+        );
+        background-size: 100% 2px, 6px 100%;
+        pointer-events: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.3s;
+      }
+
+      /* Scanline */
+      .scanline {
+        width: 100%;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        position: fixed;
+        top: 0;
+        left: 0;
+        animation: scanline 8s linear infinite;
+        pointer-events: none;
+        z-index: 9998;
+        display: block;
+      }
+
+      /* Reader Mode Overrides */
+      body.reader-mode .crt-overlay {
+        opacity: 0;
+      }
+      body.reader-mode .scanline {
+        display: none;
+      }
+      body.reader-mode * {
+        text-shadow: none !important;
+        box-shadow: none !important;
+        animation: none !important;
+      }
+      /* Reinstate border radius and simpler look for reader mode */
+      body.reader-mode .retro-card, 
+      body.reader-mode .retro-btn {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        border-style: solid !important;
+      }
+      body.reader-mode .retro-card::after {
+        display: none !important;
+      }
+
+      @keyframes scanline {
+        0% { top: -10%; opacity: 0; }
+        10% { opacity: 1; }
+        100% { top: 110%; opacity: 0; }
+      }
+
+      /* Retro Scrollbar */
+      ::-webkit-scrollbar {
+        width: 12px;
+        background: var(--color-surface);
+        border-left: 1px solid var(--color-border);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--color-dim);
+        border: 2px solid var(--color-surface);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-primary);
+      }
+
+      /* Retro Utilities */
+      .retro-border {
+        border: 2px solid var(--color-dim);
+        box-shadow: 4px 4px 0px var(--color-border);
+      }
+      
+      .retro-card {
+        background-color: var(--color-surface);
+        border: 2px solid var(--color-dim);
+        position: relative;
+        transition: background-color 0.3s, border-color 0.3s;
+      }
+      .retro-card::after {
+        content: '';
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        bottom: 4px;
+        left: 4px;
+        border: 1px dashed var(--color-dim);
+        pointer-events: none;
+      }
+
+      .retro-btn {
+        background: var(--color-surface-light);
+        border: 2px solid var(--color-primary);
+        color: var(--color-primary);
+        text-transform: uppercase;
+        font-weight: bold;
+        transition: all 0.1s;
+        box-shadow: 4px 4px 0px var(--color-primary);
+      }
+      .retro-btn:hover {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0px var(--color-primary);
+        background: var(--color-primary);
+        color: var(--color-bg);
+      }
+      .retro-btn:active {
+        transform: translate(4px, 4px);
+        box-shadow: 0px 0px 0px var(--color-primary);
+      }
+
+      .animate-blink {
+        animation: blink 1s step-end infinite;
+      }
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+      }
+
+      /* CRT Turn Off Animation */
+      .crt-turn-off {
+        animation: turn-off 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+      }
+      @keyframes turn-off {
+        0% { transform: scale(1, 1.3) translate3d(0, 0, 0); filter: brightness(1); opacity: 1; }
+        60% { transform: scale(1, 0.001) translate3d(0, 0, 0); filter: brightness(10); }
+        100% { transform: scale(0, 0.001) translate3d(0, 0, 0); filter: brightness(0); opacity: 0; }
+      }
+
+      /* Modal Entry Animation */
+      .animate-modal-in {
+        animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      @keyframes modalIn {
+        from { opacity: 0; transform: scale(0.95) translateY(20px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+      }
+
+      /* Page Fade In */
+      .animate-fade-in {
+        animation: fadeIn 0.8s ease-out forwards;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.4.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
